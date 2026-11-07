@@ -286,14 +286,14 @@ h2{font-size:18px;font-weight:800;letter-spacing:-.3px}
   </div>
   <div class="bal"><div><span>Баланс</span><b data-bal>0 сом</b></div><button class="btn white" style="margin:0" onclick="go('topup')">＋ Пополнить</button></div>
   <div class="stats">
-    <div class="stat"><b>3</b><span>Покупок</span></div>
-    <div class="stat"><b>350</b><span>Куплено Stars</span></div>
-    <div class="stat"><b>1</b><span>Куплено NFT</span></div>
-    <div class="stat"><b>1 275 сом</b><span>Потрачено</span></div>
+    <div class="stat"><b id="stP">0</b><span>Покупок</span></div>
+    <div class="stat"><b id="stS">0</b><span>Куплено Stars</span></div>
+    <div class="stat"><b id="stN">0</b><span>Куплено NFT</span></div>
+    <div class="stat"><b id="stM">0 сом</b><span>Потрачено</span></div>
   </div>
   <button class="row" onclick="go('mynft');renderMine()"><i>🎁</i>Мои NFT<em id="mineCount">›</em></button>
   <button class="row" onclick="go('orders')"><i>📜</i>История операций<em>›</em></button>
-  <button class="row" onclick="toast('Откроется чат поддержки')"><i>💬</i>Поддержка<em>›</em></button>
+  <button class="row" onclick="openSupport()"><i>💬</i>Поддержка<em>›</em></button>
 </section>
 
 <div class="sheet-bg" id="sbg" onclick="closeAsk()"></div>
@@ -351,6 +351,17 @@ const DEMO_ORDERS=[
  {id:8,t:'250 Stars',e:'⭐',sum:375,s:['r','🔴 Отменён'],d:'01.11.2026 10:11'}
 ];
 
+let SUPPORT='';
+let STATS=LIVE?{purchases:0,stars:0,nfts:0,spent:0}:{purchases:3,stars:350,nfts:1,spent:1275};
+function renderStats(){
+  const set=(id,v)=>{const e=document.getElementById(id); if(e) e.textContent=v;};
+  set('stP',money(STATS.purchases)); set('stS',money(STATS.stars)); set('stN',money(STATS.nfts)); set('stM',money(STATS.spent)+' сом');
+}
+function openSupport(){
+  if(!SUPPORT && LIVE){ toast('Поддержка пока не настроена'); return; }
+  const url='https://t.me/'+(SUPPORT||'telegram');
+  try{ tg.openTelegramLink(url); }catch(e){ window.open(url,'_blank'); }
+}
 let NFTS=LIVE?[]:DEMO_NFTS;
 let ORDERS=LIVE?[]:DEMO_ORDERS;
 
@@ -486,11 +497,11 @@ function applyState(s){
   PREM=s.premium.map(x=>({m:x.m,p:Number(x.p),e:x.m===12?'👑':'💎'}));
   NFTS=s.nfts.map(n=>({id:n.id,name:n.name,kind:n.kind||'NFT',price:Number(n.price),qty:n.qty,desc:n.desc||'',link:n.link||'',
     c:PALETTE[n.id%PALETTE.length],ic:ICS[n.id%ICS.length],img:photoCache[n.id]||null,has_photo:n.has_photo}));
-  MINE=s.mine; ORDERS=s.orders;
+  MINE=s.mine; ORDERS=s.orders; SUPPORT=s.support||''; STATS=s.stats||STATS;
   renderAll();
   NFTS.filter(n=>n.has_photo&&!n.img).forEach(loadPhoto);
 }
-function renderAll(){ renderHome(); renderChips(); renderCatalog(); renderStars(); updateStars(); renderPrem(); setBal(); renderMine(); renderOrders(); }
+function renderAll(){ renderHome(); renderChips(); renderCatalog(); renderStars(); updateStars(); renderPrem(); setBal(); renderMine(); renderOrders(); renderStats(); }
 renderAll();
 if(LIVE){ api('/api/state').then(applyState).catch(e=>toast('Нет связи с магазином. Попробуйте позже')); }
 </script>

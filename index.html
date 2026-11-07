@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Stars Shop</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{
+  --bg:#0b0716; --bg2:#120c24; --card:#181030; --card2:#1f1640;
+  --line:rgba(167,139,250,.16); --text:#f4f0ff; --muted:#9a8fc0;
+  --p1:#8b5cf6; --p2:#a855f7; --p3:#c084fc; --p4:#6d28d9;
+  --ok:#34d399; --warn:#fbbf24; --bad:#f87171; --info:#60a5fa;
+  --grad:linear-gradient(135deg,#7c3aed 0%,#a855f7 55%,#d946ef 100%);
+  --glow:0 8px 28px rgba(139,92,246,.45);
+  --r:20px; --tab:68px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--text);font-family:-apple-system,"SF Pro Display","Segoe UI",Roboto,Inter,sans-serif;min-height:100%}
+body{max-width:520px;margin:0 auto;position:relative;overflow-x:hidden;padding-bottom:calc(var(--tab) + 28px + env(safe-area-inset-bottom))}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(520px 340px at 85% -5%,rgba(168,85,247,.38),transparent 70%),
+             radial-gradient(420px 320px at -10% 30%,rgba(109,40,217,.28),transparent 70%),
+             radial-gradient(500px 400px at 60% 110%,rgba(217,70,239,.16),transparent 70%),var(--bg)}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+.screen{display:none;padding:0 16px;animation:in .28s ease}
+.screen.on{display:block}
+@keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;padding:18px 0 14px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;letter-spacing:-.3px}
+.logo{width:38px;height:38px;border-radius:12px;background:var(--grad);display:grid;place-items:center;box-shadow:var(--glow);font-size:19px}
+.brand b{background:linear-gradient(90deg,#fff,#d8b4fe);-webkit-background-clip:text;background-clip:text;color:transparent}
+.user{display:flex;align-items:center;gap:8px;padding:5px 12px 5px 5px;border-radius:30px;background:var(--card);border:1px solid var(--line);font-size:13px;font-weight:600}
+.ava{width:28px;height:28px;border-radius:50%;background:var(--grad);display:grid;place-items:center;font-size:13px;font-weight:800}
+.back{display:flex;align-items:center;gap:6px;padding:18px 0 12px;color:var(--p3);font-weight:600;font-size:15px}
+h1{font-size:26px;letter-spacing:-.6px;font-weight:800}
+h2{font-size:18px;font-weight:800;letter-spacing:-.3px}
+.sub{color:var(--muted);font-size:14px;margin-top:4px}
+.sec{display:flex;align-items:baseline;justify-content:space-between;margin:24px 0 12px}
+.sec a{color:var(--p3);font-size:13px;font-weight:600}
+
+/* search */
+.search{display:flex;align-items:center;gap:10px;padding:0 16px;height:48px;border-radius:16px;background:var(--card);border:1px solid var(--line);margin:4px 0 4px;transition:.2s}
+.search:focus-within{border-color:var(--p1);box-shadow:0 0 0 3px rgba(139,92,246,.2)}
+.search input{flex:1;background:none;border:0;outline:0;color:var(--text);font:inherit;font-size:15px}
+.search input::placeholder{color:var(--muted)}
+
+/* hero */
+.hero{position:relative;overflow:hidden;border-radius:26px;padding:22px 20px;margin-top:14px;background:var(--grad);box-shadow:var(--glow)}
+.hero::after{content:"";position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.35),transparent 65%)}
+.hero .tag{display:inline-block;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,.2);font-size:12px;font-weight:700;backdrop-filter:blur(6px)}
+.hero h1{margin:12px 0 6px;font-size:25px;max-width:78%;line-height:1.15}
+.hero p{font-size:13.5px;opacity:.9;max-width:72%;line-height:1.4}
+.hero .big{position:absolute;right:14px;bottom:8px;font-size:84px;filter:drop-shadow(0 8px 14px rgba(0,0,0,.35));transform:rotate(-8deg)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:50px;padding:0 24px;border-radius:16px;font-weight:700;font-size:15.5px;transition:.15s}
+.btn:active{transform:scale(.97)}
+.btn.pri{background:var(--grad);box-shadow:var(--glow);color:#fff}
+.btn.sec2{background:var(--card2);border:1px solid var(--line)}
+.btn.white{background:#fff;color:#5b21b6;height:42px;font-size:14px;margin-top:14px}
+.btn.full{width:100%}
+.btn[disabled]{opacity:.45;box-shadow:none;pointer-events:none}
+
+/* tiles */
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.tile{position:relative;overflow:hidden;text-align:left;padding:16px;border-radius:var(--r);background:var(--card);border:1px solid var(--line);min-height:120px;display:flex;flex-direction:column;justify-content:flex-end;transition:.15s}
+.tile:active{transform:scale(.97)}
+.tile.wide{grid-column:span 2;min-height:96px;flex-direction:row;align-items:center;gap:14px;justify-content:flex-start}
+.tile .ic{position:absolute;right:12px;top:10px;font-size:42px;filter:drop-shadow(0 6px 10px rgba(139,92,246,.5))}
+.tile.wide .ic{position:static;font-size:40px}
+.tile b{display:block;font-size:16px;font-weight:800}
+.tile span{font-size:12.5px;color:var(--muted)}
+.tile.g1{background:linear-gradient(160deg,#2a1a5c,#181030)}
+.tile.g2{background:linear-gradient(160deg,#3b1670,#181030)}
+.tile.g3{background:linear-gradient(160deg,#4a1a6e,#181030)}
+
+/* nft */
+.hs{display:flex;gap:12px;overflow-x:auto;margin:0 -16px;padding:0 16px 6px;scrollbar-width:none;scroll-snap-type:x mandatory}
+.hs::-webkit-scrollbar{display:none}
+.hs .nft{min-width:158px;scroll-snap-align:start}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.nft{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;text-align:left;transition:.15s;position:relative}
+.nft:active{transform:scale(.97)}
+.pic{aspect-ratio:1;display:grid;place-items:center;position:relative;overflow:hidden}
+.pic svg{width:70%;height:70%;filter:drop-shadow(0 10px 14px rgba(0,0,0,.35))}
+.pic::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 2px,transparent 2px 22px)}
+.badge{position:absolute;top:10px;left:10px;padding:4px 9px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(11,7,22,.6);backdrop-filter:blur(8px);z-index:1}
+.badge.out{background:rgba(248,113,113,.25);color:#fecaca}
+.nft .info{padding:12px}
+.nft .nm{font-weight:700;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nft .ds{font-size:12px;color:var(--muted);margin-top:2px}
+.nft .pr{margin-top:8px;font-weight:800;color:var(--p3);font-size:15px}
+.chips{display:flex;gap:8px;overflow-x:auto;margin:14px -16px 14px;padding:0 16px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:9px 16px;border-radius:30px;background:var(--card);border:1px solid var(--line);font-size:13.5px;font-weight:600;color:var(--muted);transition:.15s}
+.chip.on{background:var(--grad);color:#fff;border-color:transparent;box-shadow:var(--glow)}
+
+/* detail */
+.dpic{aspect-ratio:1;border-radius:28px;display:grid;place-items:center;position:relative;overflow:hidden;box-shadow:var(--glow)}
+.dpic svg{width:62%;height:62%;filter:drop-shadow(0 16px 20px rgba(0,0,0,.4));animation:float 4s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-8px)}}
+.pic img,.dpic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.dpic.photo svg{animation:none}
+.pic:has(img)::before,.dpic.photo::before{display:none}
+.dpic::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(255,255,255,.06) 0 2px,transparent 2px 26px)}
+.dh{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-top:18px}
+.price{font-size:26px;font-weight:800;color:var(--p3);white-space:nowrap}
+.price small{font-size:14px;color:var(--muted);font-weight:600}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+.fact{padding:14px;border-radius:16px;background:var(--card);border:1px solid var(--line)}
+.fact span{font-size:12px;color:var(--muted)}
+.fact b{display:block;margin-top:3px;font-size:15px}
+.desc{color:#cfc6ee;font-size:14.5px;line-height:1.55}
+.link{display:flex;align-items:center;gap:10px;padding:14px;margin-top:14px;border-radius:16px;background:var(--card);border:1px dashed rgba(167,139,250,.4);color:var(--p3);font-weight:600;font-size:14px}
+
+/* packs */
+.rate{display:flex;align-items:center;gap:10px;padding:14px 16px;border-radius:18px;background:var(--card);border:1px solid var(--line);margin:14px 0;font-size:14px}
+.pk{display:flex;align-items:center;gap:14px;width:100%;padding:16px;margin-bottom:10px;border-radius:18px;background:var(--card);border:1.5px solid var(--line);text-align:left;transition:.15s}
+.pk.on{border-color:var(--p2);background:linear-gradient(135deg,rgba(124,58,237,.35),rgba(168,85,247,.12));box-shadow:var(--glow)}
+.pk .e{font-size:30px;width:50px;height:50px;border-radius:15px;background:var(--card2);display:grid;place-items:center}
+.pk .t{flex:1}.pk .t b{display:block;font-size:16px}.pk .t span{font-size:12.5px;color:var(--muted)}
+.pk .p{font-weight:800;font-size:16px}
+.pk .hot{display:inline-block;margin-left:6px;padding:2px 8px;border-radius:10px;background:var(--grad);font-size:10.5px;font-weight:800}
+.custom{padding:16px;border-radius:20px;background:var(--card);border:1px solid var(--line)}
+.custom label{font-size:13.5px;color:var(--muted);font-weight:600}
+.inp{display:flex;align-items:center;gap:10px;height:56px;margin-top:10px;padding:0 16px;border-radius:16px;background:var(--bg2);border:1.5px solid var(--line);transition:.2s}
+.inp:focus-within{border-color:var(--p2);box-shadow:0 0 0 3px rgba(168,85,247,.22)}
+.inp span{font-size:22px}
+.inp input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--text);font:inherit;font-size:22px;font-weight:800}
+.inp input::placeholder{color:var(--muted);font-weight:500;font-size:16px}
+.calc{margin-top:10px;font-size:14px;color:var(--muted)}
+.calc b{color:var(--p3);font-size:17px}.calc.bad{color:var(--bad)}
+.dock{position:sticky;bottom:calc(var(--tab) + 16px + env(safe-area-inset-bottom));margin-top:16px}
+
+/* orders */
+.ord{padding:16px;border-radius:18px;background:var(--card);border:1px solid var(--line);margin-bottom:10px}
+.ord .r{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ord .n{font-weight:800}.ord .d{font-size:12.5px;color:var(--muted);margin-top:6px}
+.st{padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap}
+.st.y{background:rgba(251,191,36,.15);color:var(--warn)}.st.b{background:rgba(96,165,250,.15);color:var(--info)}
+.st.o{background:rgba(251,146,60,.15);color:#fb923c}.st.g{background:rgba(52,211,153,.15);color:var(--ok)}
+.st.r{background:rgba(248,113,113,.15);color:var(--bad)}
+
+/* profile */
+.pcard{text-align:center;padding:26px 16px;border-radius:26px;background:linear-gradient(160deg,#2d1b69,#181030);border:1px solid var(--line);margin-top:6px}
+.pcard .ava{width:84px;height:84px;font-size:34px;margin:0 auto 12px;box-shadow:var(--glow)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.stat{padding:16px;border-radius:18px;background:var(--card);border:1px solid var(--line)}
+.stat b{display:block;font-size:22px;font-weight:800;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat span{font-size:12.5px;color:var(--muted)}
+.row{display:flex;align-items:center;gap:12px;width:100%;padding:16px;margin-top:10px;border-radius:18px;background:var(--card);border:1px solid var(--line);text-align:left;font-weight:600}
+.row i{font-style:normal;font-size:20px}.row em{margin-left:auto;color:var(--muted);font-style:normal}
+
+/* tabbar */
+.tabs{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom));width:calc(min(520px,100%) - 24px);height:var(--tab);
+  display:grid;grid-template-columns:repeat(4,1fr);padding:8px;border-radius:26px;background:rgba(24,16,48,.82);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--line);box-shadow:0 14px 40px rgba(0,0,0,.5);z-index:10}
+.tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:18px;color:var(--muted);font-size:11px;font-weight:600;transition:.2s}
+.tab i{font-style:normal;font-size:21px;filter:grayscale(1) opacity(.7);transition:.2s}
+.tab.on{color:#fff;background:linear-gradient(135deg,rgba(124,58,237,.55),rgba(168,85,247,.3))}
+.tab.on i{filter:none}
+.toast{position:fixed;left:50%;top:18px;transform:translate(-50%,-90px);padding:12px 20px;border-radius:16px;background:var(--card2);border:1px solid var(--p2);box-shadow:var(--glow);font-weight:600;font-size:14px;transition:.3s;z-index:30;max-width:90%}
+.toast.on{transform:translate(-50%,0)}
+.bal{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;margin-top:14px;border-radius:22px;background:linear-gradient(135deg,#2d1b69,#3b1670);border:1px solid rgba(192,132,252,.3);box-shadow:var(--glow)}
+.bal span{font-size:12.5px;color:#d8b4fe}.bal b{display:block;font-size:28px;font-weight:800;letter-spacing:-.5px;margin-top:2px}
+.bal .btn{height:44px;padding:0 18px;font-size:14.5px}
+.steps{margin-top:16px;padding:16px;border-radius:18px;background:var(--card);border:1px solid var(--line);font-size:14px;line-height:1.6;color:#cfc6ee}
+.steps b{color:var(--text)}
+.qs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.qs .chip{text-align:center;padding:12px 0}
+.mine{display:flex;gap:14px;padding:12px;margin-bottom:12px;border-radius:20px;background:var(--card);border:1px solid var(--line)}
+.mine .th{width:84px;height:84px;border-radius:16px;overflow:hidden;position:relative;flex:none;display:grid;place-items:center}
+.mine .th svg{width:70%;height:70%}.mine .th img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.mine .t{flex:1;min-width:0}.mine .t b{display:block;font-size:16px}.mine .t span{font-size:12.5px;color:var(--muted)}
+.mine .btn{height:38px;padding:0 14px;font-size:13px;margin-top:10px}
+.sheet-bg{position:fixed;inset:0;background:rgba(5,2,12,.65);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:.25s;z-index:40}
+.sheet-bg.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:50%;bottom:0;transform:translate(-50%,105%);width:min(520px,100%);padding:22px 20px calc(24px + env(safe-area-inset-bottom));border-radius:28px 28px 0 0;background:var(--card);border:1px solid var(--line);transition:.3s;z-index:41}
+.sheet.on{transform:translate(-50%,0)}
+.sheet h2{font-size:20px}.sheet p{color:#cfc6ee;font-size:14.5px;line-height:1.55;margin:10px 0 16px}
+.sheet .two{display:grid;grid-template-columns:1fr 1.4fr;gap:10px}
+.empty{text-align:center;color:var(--muted);padding:40px 0}
+</style>
+</head>
+<body>
+
+<!-- ГЛАВНАЯ -->
+<section class="screen on" id="home">
+  <div class="top">
+    <div class="brand"><div class="logo">⭐</div><b>Stars Shop</b></div>
+    <div class="user"><div class="ava" data-ava>A</div><span data-name>Гость</span></div>
+  </div>
+  <div class="search"><span>🔍</span><input id="q0" placeholder="Найти NFT" oninput="searchFromHome(this.value)"></div>
+
+  <div class="bal"><div><span>Ваш баланс</span><b data-bal>0 сом</b></div><button class="btn white" style="margin:0" onclick="go('topup')">＋ Пополнить</button></div>
+
+  <div class="hero">
+    <span class="tag">✨ Цифровой магазин</span>
+    <h1>Stars, Premium и NFT</h1>
+    <p>Пополните баланс по QR и покупайте всё в один клик.</p>
+    <button class="btn white" onclick="go('stars')">Купить Stars →</button>
+    <div class="big">⭐</div>
+  </div>
+
+  <div class="tiles">
+    <button class="tile g1" onclick="go('stars')"><div class="ic">⭐</div><b>Stars</b><span>от 75 сом</span></button>
+    <button class="tile g2" onclick="go('premium')"><div class="ic">💎</div><b>Premium</b><span>3 · 6 · 12 мес.</span></button>
+    <button class="tile g3 wide" onclick="go('catalog')"><div class="ic">🎁</div><div><b>Магазин NFT</b><span>Коллекционные подарки Telegram</span></div></button>
+  </div>
+
+  <div class="sec"><h2>🔥 Новые NFT</h2><a onclick="go('catalog')">Все →</a></div>
+  <div class="hs" id="homeNft"></div>
+</section>
+
+<!-- КАТАЛОГ -->
+<section class="screen" id="catalog">
+  <div class="top"><h1>🎁 NFT</h1><div class="user"><div class="ava" data-ava>A</div></div></div>
+  <div class="search"><span>🔍</span><input id="q" placeholder="Найти NFT" oninput="renderCatalog()"></div>
+  <div class="chips" id="chips"></div>
+  <div class="grid" id="grid"></div>
+</section>
+
+<!-- КАРТОЧКА NFT -->
+<section class="screen" id="detail">
+  <button class="back" onclick="go('catalog')">‹ К каталогу</button>
+  <div id="detailBody"></div>
+</section>
+
+<!-- STARS -->
+<section class="screen" id="stars">
+  <div class="top"><h1>⭐ Telegram Stars</h1></div>
+  <div class="rate">📈 Текущий курс: <b>1 Star = 1.5 сом</b></div>
+  <div class="custom">
+    <label for="starsInput">Сколько Stars хотите купить?</label>
+    <div class="inp"><span>⭐</span><input id="starsInput" type="number" inputmode="numeric" min="50" max="50000" step="1" placeholder="Например, 300" oninput="onStarsInput(this.value)"></div>
+    <div class="calc" id="starsCalc">Минимум 50, максимум 50 000</div>
+  </div>
+  <div class="sec"><h2>Быстрый выбор</h2></div>
+  <div id="starsList"></div>
+  <div class="dock"><button class="btn pri full" id="starsBuy" disabled onclick="buyStars()">Укажите количество</button></div>
+</section>
+
+<!-- PREMIUM -->
+<section class="screen" id="premium">
+  <div class="top"><h1>💎 Premium</h1></div>
+  <p class="sub" style="margin-bottom:14px">Подарим Telegram Premium на ваш аккаунт после подтверждения оплаты.</p>
+  <div id="premList"></div>
+  <div class="dock"><button class="btn pri full" id="premBuy" disabled onclick="buyPrem()">Выберите срок</button></div>
+</section>
+
+<!-- ПОПОЛНЕНИЕ -->
+<section class="screen" id="topup">
+  <div class="top"><h1>💳 Пополнение</h1></div>
+  <div class="bal"><div><span>Баланс сейчас</span><b data-bal>0 сом</b></div></div>
+  <div class="custom" style="margin-top:14px">
+    <label for="topInput">Сумма пополнения, сом</label>
+    <div class="inp"><span>💰</span><input id="topInput" type="number" inputmode="numeric" min="50" step="1" placeholder="От 50 сом" oninput="onTop(this.value)"></div>
+    <div class="calc" id="topCalc">Минимум 50 сом</div>
+  </div>
+  <div class="qs" id="topQs"></div>
+  <div class="steps"><b>Как это работает</b><br>1. Нажмите «Получить QR»: он придёт в чат с ботом.<br>2. Оплатите ровно эту сумму в приложении банка.<br>3. Нажмите «Я оплатил» в чате, мы проверим платёж.<br>4. После подтверждения деньги появятся на балансе.</div>
+  <div class="dock"><button class="btn pri full" id="topBtn" disabled onclick="askTop()">Укажите сумму</button></div>
+</section>
+
+<!-- МОИ NFT -->
+<section class="screen" id="mynft">
+  <button class="back" onclick="go('profile')">‹ Профиль</button>
+  <div class="top" style="padding-top:0"><h1>🎁 Мои NFT</h1></div>
+  <p class="sub" style="margin-bottom:14px">Вывод NFT на ваш аккаунт стоит <b style="color:var(--text)">30 сом</b>, они спишутся с баланса.</p>
+  <div id="mineList"></div>
+</section>
+
+<!-- ЗАКАЗЫ -->
+<section class="screen" id="orders">
+  <div class="top"><h1>📜 Операции</h1></div>
+  <div id="ordList"></div>
+</section>
+
+<!-- ПРОФИЛЬ -->
+<section class="screen" id="profile">
+  <div class="top"><h1>👤 Профиль</h1></div>
+  <div class="pcard">
+    <div class="ava" data-ava>A</div>
+    <h2 data-name>Гость</h2>
+    <div class="sub" id="pid">ID 000000000</div>
+  </div>
+  <div class="bal"><div><span>Баланс</span><b data-bal>0 сом</b></div><button class="btn white" style="margin:0" onclick="go('topup')">＋ Пополнить</button></div>
+  <div class="stats">
+    <div class="stat"><b>3</b><span>Покупок</span></div>
+    <div class="stat"><b>350</b><span>Куплено Stars</span></div>
+    <div class="stat"><b>1</b><span>Куплено NFT</span></div>
+    <div class="stat"><b>1 275 сом</b><span>Потрачено</span></div>
+  </div>
+  <button class="row" onclick="go('mynft');renderMine()"><i>🎁</i>Мои NFT<em id="mineCount">›</em></button>
+  <button class="row" onclick="go('orders')"><i>📜</i>История операций<em>›</em></button>
+  <button class="row" onclick="toast('Откроется чат поддержки')"><i>💬</i>Поддержка<em>›</em></button>
+</section>
+
+<div class="sheet-bg" id="sbg" onclick="closeAsk()"></div>
+<div class="sheet" id="sheet"><h2 id="shT"></h2><p id="shP"></p><div class="two"><button class="btn sec2" onclick="closeAsk()">Отмена</button><button class="btn pri" id="shOk">Подтвердить</button></div></div>
+
+<nav class="tabs">
+  <button class="tab on" data-tab="home" onclick="go('home')"><i>🏠</i>Главная</button>
+  <button class="tab" data-tab="catalog" onclick="go('catalog')"><i>🎁</i>NFT</button>
+  <button class="tab" data-tab="orders" onclick="go('orders')"><i>📜</i>Операции</button>
+  <button class="tab" data-tab="profile" onclick="go('profile')"><i>👤</i>Профиль</button>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- Telegram ---------- */
+const tg = window.Telegram && window.Telegram.WebApp;
+if (tg){ try{ tg.ready(); tg.expand(); tg.setHeaderColor('#0b0716'); tg.setBackgroundColor('#0b0716'); }catch(e){} }
+const u = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) || {first_name:'Гость', id:0};
+document.querySelectorAll('[data-name]').forEach(e=>e.textContent=u.first_name);
+document.querySelectorAll('[data-ava]').forEach(e=>e.textContent=(u.first_name||'G')[0].toUpperCase());
+document.getElementById('pid').textContent = 'ID ' + u.id;
+
+/* ---------- Тестовые данные (потом заменим данными из бота) ---------- */
+const NFTS = [
+ {id:1,img:'img/chill_flame.jpg',name:'Chill Flame',kind:'Oil Lamp',price:550,qty:1,c:['#a855f7','#7c3aed'],ic:'lamp',desc:'Коллекционная лампа из подарков Telegram. Тёплое пламя на фиолетовом фоне.',link:'https://t.me/nft/ChillFlame-103494'},
+ {id:2,name:'Plush Pepe',kind:'Plush',price:1200,qty:3,c:['#34d399','#047857'],ic:'star',desc:'Мягкая игрушка из лимитированной серии.',link:'https://t.me/nft/PlushPepe-1'},
+ {id:3,name:'Ice Cream',kind:'Sweet',price:320,qty:5,c:['#f472b6','#be185d'],ic:'gem',desc:'Сладкий подарок для коллекции.',link:'https://t.me/nft/IceCream-2'},
+ {id:4,name:'Night Owl',kind:'Bird',price:780,qty:0,c:['#60a5fa','#1d4ed8'],ic:'star',desc:'Ночная сова, сейчас закончилась.',link:''},
+ {id:5,name:'Golden Cup',kind:'Trophy',price:950,qty:2,c:['#fbbf24','#b45309'],ic:'gem',desc:'Золотой кубок победителя.',link:'https://t.me/nft/GoldenCup-5'},
+ {id:6,name:'Neon Heart',kind:'Heart',price:430,qty:4,c:['#fb7185','#9f1239'],ic:'heart',desc:'Неоновое сердце.',link:'https://t.me/nft/NeonHeart-6'}
+];
+const STARS=[50,100,250,500,1000,2500,5000], RATE=1.5;
+const MIN_TOP=50, WITHDRAW_FEE=30;
+let balance=430;
+let MINE=[{id:5,paid:950,date:'03.11.2026'}];
+const PREM=[{m:3,p:1160,e:'💎'},{m:6,p:1550,e:'💎',hot:'Выгодно'},{m:12,p:2800,e:'👑',hot:'−20%'}];
+const ORDERS=[
+ {id:15,t:'Пополнение баланса',e:'💳',sum:500,s:['g','🟢 Зачислено'],d:'03.11.2026 18:20'},
+ {id:14,t:'Вывод Golden Cup (комиссия)',e:'📤',sum:30,s:['o','🟠 Выполняется'],d:'03.11.2026 18:25'},
+ {id:12,t:'100 Stars',e:'⭐',sum:150,s:['g','🟢 Выполнен'],d:'03.11.2026 14:05'},
+ {id:11,t:'Chill Flame',e:'🎁',sum:550,s:['o','🟠 Выполняется'],d:'03.11.2026 12:40'},
+ {id:9,t:'Premium на 3 мес.',e:'💎',sum:1160,s:['y','🟡 Ожидает оплаты'],d:'02.11.2026 19:20'},
+ {id:8,t:'250 Stars',e:'⭐',sum:375,s:['r','🔴 Отменён'],d:'01.11.2026 10:11'}
+];
+
+/* ---------- Картинки NFT (SVG-заглушки; в приложении будут настоящие фото) ---------- */
+const ICONS={
+ lamp:'<svg viewBox="0 0 100 100"><path d="M50 8c8 12 14 18 8 28-3 5-14 5-16 0-5-10 3-16 8-28z" fill="#fde68a"/><path d="M50 18c4 8 7 11 4 17-2 3-8 3-9 0-2-6 2-9 5-17z" fill="#f97316"/><rect x="40" y="38" width="20" height="8" rx="3" fill="#fbbf24"/><path d="M34 46h32l6 24H28z" fill="#f59e0b"/><ellipse cx="50" cy="78" rx="26" ry="9" fill="#d97706"/></svg>',
+ star:'<svg viewBox="0 0 100 100"><path d="M50 8l13 27 29 4-21 21 5 30-26-14-26 14 5-30L8 39l29-4z" fill="#fff" opacity=".92"/></svg>',
+ gem:'<svg viewBox="0 0 100 100"><path d="M26 28h48l16 20-40 44L10 48z" fill="#fff" opacity=".92"/><path d="M10 48h80M36 28l14 64M64 28L50 92" stroke="rgba(0,0,0,.18)" stroke-width="3" fill="none"/></svg>',
+ heart:'<svg viewBox="0 0 100 100"><path d="M50 88C14 62 6 40 20 24c10-10 24-6 30 6 6-12 20-16 30-6 14 16 6 38-30 64z" fill="#fff" opacity=".92"/></svg>'
+};
+const art = n => n.img ? `<img src="${n.img}" alt="${n.name}" loading="lazy">` : ICONS[n.ic];
+const bg = n => `background:linear-gradient(150deg,${n.c[0]},${n.c[1]})`;
+const money = v => v.toLocaleString('ru-RU').replace(/ /g,' ');
+
+/* ---------- Навигация ---------- */
+const MAIN=['home','catalog','orders','profile'];
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===id||(id==='detail'&&t.dataset.tab==='catalog')));
+  window.scrollTo({top:0});
+  if (tg && tg.BackButton){ try{ if(MAIN.includes(id)) tg.BackButton.hide(); else {tg.BackButton.show();} }catch(e){} }
+}
+if (tg && tg.BackButton){ try{ tg.BackButton.onClick(()=>go('home')); }catch(e){} }
+function setBal(){document.querySelectorAll('[data-bal]').forEach(e=>e.textContent=money(balance)+' сом');const c=document.getElementById('mineCount');if(c)c.textContent=MINE.length?MINE.length+' ›':'›';}
+function ask(t,p,ok,fn){document.getElementById('shT').textContent=t;document.getElementById('shP').innerHTML=p;const b=document.getElementById('shOk');b.textContent=ok;b.onclick=()=>{closeAsk();fn();};document.getElementById('sbg').classList.add('on');document.getElementById('sheet').classList.add('on');}
+function closeAsk(){document.getElementById('sbg').classList.remove('on');document.getElementById('sheet').classList.remove('on');}
+/* оплата с баланса: если не хватает, ведём на пополнение с нужной суммой */
+function pay(title,amount,done,okText='Купить',askTitle='Подтвердите покупку'){
+  if(balance<amount){const need=Math.ceil(amount-balance);toast('Не хватает '+money(need)+' сом. Пополните баланс');
+    go('topup');const v=Math.max(MIN_TOP,need);document.getElementById('topInput').value=v;onTop(v);return;}
+  ask(askTitle,`${title}<br>Спишем с баланса: <b>${money(amount)} сом</b><br>Останется: ${money(balance-amount)} сом`,okText,()=>{balance-=amount;setBal();haptic();done();});
+}
+let tt; function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2200);}
+function haptic(){ try{tg.HapticFeedback.impactOccurred('light')}catch(e){} }
+
+/* ---------- NFT ---------- */
+function card(n){
+  return `<button class="nft" onclick="openNft(${n.id})">
+    <div class="pic" style="${bg(n)}"><span class="badge ${n.qty?'':'out'}">${n.qty?'В наличии '+n.qty:'Нет в наличии'}</span>${art(n)}</div>
+    <div class="info"><div class="nm">${n.name}</div><div class="ds">${n.kind}</div><div class="pr">${money(n.price)} сом</div></div></button>`;
+}
+document.getElementById('homeNft').innerHTML = NFTS.slice(0,5).map(card).join('');
+let cat='Все';
+const KINDS=['Все',...new Set(NFTS.map(n=>n.kind))];
+function renderChips(){document.getElementById('chips').innerHTML=KINDS.map(k=>`<button class="chip ${k===cat?'on':''}" onclick="cat='${k}';renderChips();renderCatalog()">${k}</button>`).join('');}
+function renderCatalog(){
+  const q=document.getElementById('q').value.trim().toLowerCase();
+  const list=NFTS.filter(n=>(cat==='Все'||n.kind===cat)&&(!q||n.name.toLowerCase().includes(q)));
+  document.getElementById('grid').innerHTML=list.length?list.map(card).join(''):'<div class="empty" style="grid-column:span 2">Ничего не найдено</div>';
+}
+function searchFromHome(v){ if(!v) return; document.getElementById('q').value=v; document.getElementById('q0').value=''; go('catalog'); renderCatalog(); }
+function openNft(id){
+  const n=NFTS.find(x=>x.id===id); haptic();
+  document.getElementById('detailBody').innerHTML=`
+    <div class="dpic ${n.img?'photo':''}" style="${bg(n)}">${art(n)}</div>
+    <div class="dh"><div><h1>${n.name}</h1><div class="sub">${n.kind}</div></div><div class="price">${money(n.price)} <small>сом</small></div></div>
+    <div class="facts"><div class="fact"><span>Наличие</span><b style="color:${n.qty?'var(--ok)':'var(--bad)'}">${n.qty?n.qty+' шт.':'Нет в наличии'}</b></div>
+      <div class="fact"><span>Резерв после заказа</span><b>30 минут</b></div></div>
+    <p class="desc">${n.desc}</p>
+    ${n.link?`<a class="link" href="${n.link}" target="_blank">🔗 Посмотреть NFT в Telegram</a>`:''}
+    <div class="dock"><button class="btn pri full" ${n.qty?'':'disabled'} onclick="buyNft(${n.id})">${n.qty?'💳 Купить за '+money(n.price)+' сом':'Нет в наличии'}</button></div>`;
+  go('detail');
+}
+function buyNft(id){ const n=NFTS.find(x=>x.id===id); pay(`🎁 ${n.name}`,n.price,()=>{MINE.push({id:n.id,paid:n.price,date:'сегодня'});n.qty=Math.max(0,n.qty-1);renderCatalog();toast('Куплено! NFT в разделе «Мои NFT»');setBal();}); }
+
+/* ---------- Stars / Premium ---------- */
+let selS=null, selP=null;
+const MIN_S=50, MAX_S=50000;
+const priceS = n => Math.round(n*RATE*100)/100;
+function setStars(n){ selS=n; document.getElementById('starsInput').value=n||''; updateStars(); renderStars(); }
+function onStarsInput(v){
+  const n = v==='' ? null : Math.floor(Number(v));
+  selS = (n && n>=MIN_S && n<=MAX_S) ? n : null;
+  updateStars(n); renderStars();
+}
+function updateStars(raw){
+  const c=document.getElementById('starsCalc'), b=document.getElementById('starsBuy');
+  c.classList.remove('bad');
+  if(selS){ c.innerHTML=`К оплате: <b>${money(priceS(selS))} сом</b> · ${money(selS)} Stars`; b.disabled=false; b.textContent=`💳 Оплатить ${money(priceS(selS))} сом`; }
+  else { b.disabled=true; b.textContent='Укажите количество';
+    if(raw){ c.classList.add('bad'); c.textContent = raw<MIN_S ? `Минимум ${MIN_S} Stars` : `Максимум ${money(MAX_S)} Stars`; }
+    else c.textContent=`Минимум ${MIN_S}, максимум ${money(MAX_S)}`; }
+}
+function renderStars(){
+  document.getElementById('starsList').innerHTML=STARS.map(s=>`<button class="pk ${selS===s?'on':''}" onclick="setStars(${s})">
+    <div class="e">⭐</div><div class="t"><b>${money(s)} Stars${s===1000?'<span class="hot">Хит</span>':''}</b><span>Отправим на ваш аккаунт</span></div><div class="p">${money(priceS(s))} сом</div></button>`).join('');
+}
+function renderPrem(){
+  document.getElementById('premList').innerHTML=PREM.map(x=>`<button class="pk ${selP===x.m?'on':''}" onclick="selP=${x.m};renderPrem()">
+    <div class="e">${x.e}</div><div class="t"><b>${x.m} месяцев${x.hot?`<span class="hot">${x.hot}</span>`:''}</b><span>Telegram Premium</span></div><div class="p">${money(x.p)} сом</div></button>`).join('');
+  const b=document.getElementById('premBuy'); const x=PREM.find(v=>v.m===selP); b.disabled=!x; b.textContent=x?`💳 Оплатить ${money(x.p)} сом`:'Выберите срок';
+}
+function buyStars(){ pay(`⭐ ${money(selS)} Stars`,priceS(selS),()=>toast('Заказ создан. Отправим Stars после проверки')); }
+function buyPrem(){ const x=PREM.find(v=>v.m===selP); pay(`💎 Premium на ${x.m} мес.`,x.p,()=>toast('Заказ создан. Подарим Premium после проверки')); }
+
+/* ---------- Заказы ---------- */
+document.getElementById('ordList').innerHTML=ORDERS.map(o=>`<div class="ord"><div class="r"><span class="n">${o.e} Заказ #${o.id}</span><span class="st ${o.s[0]}">${o.s[1]}</span></div>
+  <div class="d">${o.t} · <b style="color:var(--text)">${money(o.sum)} сом</b></div><div class="d">📅 ${o.d}</div></div>`).join('');
+
+/* ---------- Пополнение ---------- */
+let topSum=null;
+document.getElementById('topQs').innerHTML=[50,100,200,300,500,1000].map(v=>`<button class="chip" onclick="document.getElementById('topInput').value=${v};onTop(${v})">${money(v)}</button>`).join('');
+function onTop(v){
+  const n=v===''?null:Math.floor(Number(v)); topSum=(n&&n>=MIN_TOP&&n<=500000)?n:null;
+  const c=document.getElementById('topCalc'),b=document.getElementById('topBtn'); c.classList.remove('bad');
+  if(topSum){c.innerHTML=`Получите на баланс: <b>${money(topSum)} сом</b>`;b.disabled=false;b.textContent=`📲 Получить QR на ${money(topSum)} сом`;}
+  else{b.disabled=true;b.textContent='Укажите сумму';if(n){c.classList.add('bad');c.textContent=n<MIN_TOP?`Минимум ${MIN_TOP} сом`:'Слишком большая сумма';}else c.textContent=`Минимум ${MIN_TOP} сом`;}
+}
+function askTop(){ask('QR придёт в чат с ботом',`Сумма: <b>${money(topSum)} сом</b>. Оплатите ровно её, затем нажмите «Я оплатил» в чате. Деньги зачислим после проверки.`,'Получить QR',()=>{toast('Откройте чат с ботом: там QR');try{tg.close()}catch(e){}});}
+
+/* ---------- Мои NFT и вывод ---------- */
+function renderMine(){
+  const el=document.getElementById('mineList');
+  el.innerHTML=MINE.length?MINE.map((m,i)=>{const n=NFTS.find(x=>x.id===m.id);return `<div class="mine"><div class="th" style="${bg(n)}">${art(n)}</div>
+    <div class="t"><b>${n.name}</b><span>${n.kind} · куплена ${m.date}</span><br><button class="btn pri" onclick="withdraw(${i})">Вывести за ${WITHDRAW_FEE} сом</button></div></div>`}).join(''):'<div class="empty">Пока нет купленных NFT</div>';
+}
+function withdraw(i){const n=NFTS.find(x=>x.id===MINE[i].id);
+  pay(`📤 Вывод «${n.name}» на ваш аккаунт<br>Комиссия вывода`,WITHDRAW_FEE,()=>{MINE.splice(i,1);renderMine();setBal();toast('Заявка на вывод создана. Передадим NFT вручную');},'Вывести','Подтвердите вывод');}
+
+renderChips(); renderCatalog(); renderStars(); updateStars(); renderPrem(); setBal(); renderMine();
+</script>
+</body>
+</html>
